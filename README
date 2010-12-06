@@ -1,0 +1,9 @@
+Dummy Flydra mainbrain server. Handy for debugging...
+
+Currently, nothing more than a copy (with slight tweaks) of
+Floris van Breugel's DummyMainbrain code, in ``floris_ros_flydra''
+repository on GitHub.
+
+
+Scott Livingston  <slivingston@caltech.edu>
+Dec 2010.
