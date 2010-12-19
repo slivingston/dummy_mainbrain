@@ -1,4 +1,16 @@
 #!/usr/bin/env python
+"""
+dummy_flydra.py
+
+create a dummy mainbrain with arbitrary number of objects, objects are born and killed, and move around.
+
+
+Originally written by Floris van Breugel;
+modifications by Scott Livingston.
+2010-2011.
+"""
+
+
 import roslib; roslib.load_manifest('ros_flydra')
 import rospy
 import ros_flydra.msg as msgs
@@ -7,14 +19,14 @@ import geometry_msgs.msg as geometry_msgs
 import numpy as np
 import time
 from optparse import OptionParser
-pi = np.pi
 
-# create a dummy mainbrain with arbitrary number of objects, objects are born and killed, and move around
+# Globals
+verbose_mode = False
 
 class DummyMainbrain:
 
     def __init__(self, nobjects=5, latency=0.05, birth_rate=0.02, death_rate=0.02,
-                 fix_nobj=False, verbose=False):
+                 fix_nobj=False):
         self.max_num_objects = nobjects
         self.latency = latency
         self.prob_birth = birth_rate
@@ -28,8 +40,11 @@ class DummyMainbrain:
             init_objects = nobjects
         else:
             init_objects = np.random.randint(0,self.max_num_objects)
-        if verbose:
+        if verbose_mode:
             print "Generating %d flies..." % init_objects
+            print "Latency set to %d" % self.latency
+            print "Probability of birth is %.4f" % self.prob_birth
+            print "Probability of death is %.4f" % self.prob_death
         self.objects = []
         for i in range(init_objects):
             self.newest_object = self.newest_object + 1
@@ -96,8 +111,14 @@ class DummyObject:
         # object ID number
         self.obj_id = obj_id
 
+        if verbose_mode:
+            print "DummyObject %d initialized with\n\t(%.4f, %.4f, %.4f) pose,"\
+                "\n\t(%.4f, %.4f, %.4f) amplitudes." % (self.obj_id,
+                                                        self.x0, self.y0, self.z0,
+                                                        self.xamp, self.yamp, self.zamp)
+
     def get_state(self):
-        theta = time.time() % (2*pi)
+        theta = time.time() % (2*np.pi)
         x = self.xamp*np.cos( theta ) + self.x0
         xvel = -self.xamp*np.sin( theta )
         y = self.yamp*np.sin( theta ) + self.y0
@@ -115,30 +136,28 @@ class DummyObject:
 if __name__ == '__main__':
 
     parser = OptionParser()
-    parser.add_option("--nobjects", type="int", dest="nobjects", default=5,
-                        help="maximum number of objects")
-    parser.add_option("--latency", type="float", dest="latency", default=0.05,
-                        help="artifial latency of dummy mainbrain")
+    parser.add_option("-n", "--nobjects", type="int", dest="nobjects", default=5,
+                      help="maximum number of objects")
+    parser.add_option("-l", "--latency", type="float", dest="latency", default=0.05,
+                      help="artifial latency of dummy mainbrain")
     parser.add_option("--birth-rate", type="float", dest="birth_rate", default=0.02,
-                        help="probability that a new object is born")
+                      help="probability that a new object is born")
     parser.add_option("--death-rate", type="float", dest="death_rate", default=0.02,
-                        help="probability that a new object dies")
-    parser.add_option("--fix-count", action="store_true", dest="fix_nobj", default=False)
-    parser.add_option("-v", action="store_true", dest="verbose_mode", default=False)
+                      help="probability that a new object dies")
+    parser.add_option("-f", "--fix-count", action="store_true", dest="fix_nobj", default=False,
+                      help="use fixed number of objects (rather than random).")
+    parser.add_option("-v", "--verbose", action="store_true", dest="verbose_mode", default=False,
+                      help="verbose mode")
     (options, args) = parser.parse_args()
 
+    # Use Verbose mode?
+    verbose_mode = options.verbose_mode
+
     print 'starting dummy mainbrain'
-    dummy_mainbrain = DummyMainbrain(   nobjects=options.nobjects, 
-                                        latency=options.latency, 
-                                        birth_rate=options.birth_rate, 
-                                        death_rate=options.death_rate,
-                                        fix_nobj=options.fix_nobj,
-                                        verbose=options.verbose_mode)
+    dummy_mainbrain = DummyMainbrain( nobjects=options.nobjects, 
+                                      latency=options.latency, 
+                                      birth_rate=options.birth_rate, 
+                                      death_rate=options.death_rate,
+                                      fix_nobj=options.fix_nobj)
     dummy_mainbrain.run()
 
-
-
-
-
-
-    
