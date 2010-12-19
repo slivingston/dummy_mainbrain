@@ -4,9 +4,8 @@
      dummy_mainbrain - handy debugging tool for Flydra position
      streams, and more...
 
-     ...Currently nothing more than a fork of Floris van Breugel's
-     dummy_flydra code, from his ``floris_ros_flydra'' repository on
-     GitHub.com.
+     ...originally forked from Floris van Breugel's dummy_flydra code,
+     in his ``floris_ros_flydra'' repository on GitHub.com.
 
   </description>
   <author>Scott C. Livingston</author>
